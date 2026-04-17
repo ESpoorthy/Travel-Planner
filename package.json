@@ -1,7 +1,19 @@
 {
-  "name": "my-travel-planner",
-  "version": "0.1.0",
+  "name": "travelcraft-planner",
+  "version": "2.0.0",
+  "description": "A beautiful, feature-rich travel planning application with authentication, budget tracking, and smart itineraries",
+  "author": "TravelCraft Team",
+  "license": "MIT",
   "private": true,
+  "keywords": [
+    "travel",
+    "planner",
+    "itinerary",
+    "budget",
+    "vacation",
+    "trip",
+    "react"
+  ],
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",

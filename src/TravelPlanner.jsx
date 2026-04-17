@@ -1,55 +1,74 @@
 import React, { useState } from "react";
+import { useAuth } from "./context/AuthContext";
+import UserProfile from "./components/UserProfile";
+import { CURRENCIES, findDestination, getDestinationNames, buildItineraryFromDayPlans } from "./data/destinations";
 import "./TravelPlanner.css";
 
-/* ---------- Activity data (expand as you like) ---------- */
-/* Each activity has: name, cost (₹), estHours, difficulty */
+/* ─── Activity Data ─────────────────────────────────────────────────── */
 const POOLS = {
   adventure: [
-    { name: "Mountain Trekking", cost: 2500, hours: 6, diff: "Hard" },
-    { name: "River Rafting", cost: 1800, hours: 4, diff: "Medium" },
-    { name: "Zipline Adventure", cost: 2000, hours: 2, diff: "Medium" },
-    { name: "Desert Safari", cost: 2200, hours: 5, diff: "Medium" },
-    { name: "Scuba Diving", cost: 4000, hours: 4, diff: "Hard" },
-    { name: "Kayaking", cost: 900, hours: 3, diff: "Easy" },
-    { name: "ATV Ride", cost: 1300, hours: 2, diff: "Medium" },
-    { name: "Rock Climbing", cost: 1200, hours: 3, diff: "Hard" },
-    { name: "Wildlife Safari", cost: 2100, hours: 6, diff: "Medium" },
-    { name: "Caving Expedition", cost: 1500, hours: 4, diff: "Hard" },
+    { name: "Mountain Trekking", cost: 2500, hours: 6, diff: "Hard", icon: "🏔️" },
+    { name: "River Rafting", cost: 1800, hours: 4, diff: "Medium", icon: "🚣" },
+    { name: "Zipline Adventure", cost: 2000, hours: 2, diff: "Medium", icon: "🪂" },
+    { name: "Desert Safari", cost: 2200, hours: 5, diff: "Medium", icon: "🐪" },
+    { name: "Scuba Diving", cost: 4000, hours: 4, diff: "Hard", icon: "🤿" },
+    { name: "Kayaking", cost: 900, hours: 3, diff: "Easy", icon: "🛶" },
+    { name: "ATV Ride", cost: 1300, hours: 2, diff: "Medium", icon: "🏍️" },
+    { name: "Rock Climbing", cost: 1200, hours: 3, diff: "Hard", icon: "🧗" },
+    { name: "Wildlife Safari", cost: 2100, hours: 6, diff: "Medium", icon: "🦁" },
+    { name: "Caving Expedition", cost: 1500, hours: 4, diff: "Hard", icon: "🕳️" },
+    { name: "Paragliding", cost: 3500, hours: 2, diff: "Hard", icon: "🪂" },
+    { name: "Bungee Jumping", cost: 3000, hours: 1, diff: "Hard", icon: "⬇️" },
   ],
   sightseeing: [
-    { name: "City Highlights Tour", cost: 800, hours: 4, diff: "Easy" },
-    { name: "Famous Museum Visit", cost: 700, hours: 3, diff: "Easy" },
-    { name: "Scenic Boat Ride", cost: 900, hours: 2, diff: "Easy" },
-    { name: "Local Heritage Walk", cost: 300, hours: 2, diff: "Easy" },
-    { name: "Panoramic Viewpoint", cost: 450, hours: 1.5, diff: "Easy" },
-    { name: "Architectural Tour", cost: 600, hours: 3, diff: "Easy" },
-    { name: "Cultural Performance", cost: 1000, hours: 2.5, diff: "Easy" },
-    { name: "Historic Fort Entry", cost: 350, hours: 2, diff: "Easy" },
-    { name: "Botanical Garden Visit", cost: 150, hours: 2, diff: "Easy" },
-    { name: "Observation Deck", cost: 700, hours: 2, diff: "Easy" },
+    { name: "City Highlights Tour", cost: 800, hours: 4, diff: "Easy", icon: "🏙️" },
+    { name: "Famous Museum Visit", cost: 700, hours: 3, diff: "Easy", icon: "🏛️" },
+    { name: "Scenic Boat Ride", cost: 900, hours: 2, diff: "Easy", icon: "⛵" },
+    { name: "Local Heritage Walk", cost: 300, hours: 2, diff: "Easy", icon: "🚶" },
+    { name: "Panoramic Viewpoint", cost: 450, hours: 1.5, diff: "Easy", icon: "🌅" },
+    { name: "Architectural Tour", cost: 600, hours: 3, diff: "Easy", icon: "🏰" },
+    { name: "Cultural Performance", cost: 1000, hours: 2.5, diff: "Easy", icon: "🎭" },
+    { name: "Historic Fort Entry", cost: 350, hours: 2, diff: "Easy", icon: "🏯" },
+    { name: "Botanical Garden Visit", cost: 150, hours: 2, diff: "Easy", icon: "🌿" },
+    { name: "Observation Deck", cost: 700, hours: 2, diff: "Easy", icon: "🔭" },
+    { name: "Night City Walk", cost: 200, hours: 2, diff: "Easy", icon: "🌃" },
+    { name: "Photography Tour", cost: 500, hours: 3, diff: "Easy", icon: "📸" },
   ],
   food: [
-    { name: "Street Food Tour", cost: 600, hours: 3, diff: "Easy" },
-    { name: "Fine Dining Experience", cost: 2500, hours: 2, diff: "Easy" },
-    { name: "Cooking Class", cost: 1800, hours: 3.5, diff: "Medium" },
-    { name: "Night Food Market", cost: 500, hours: 3, diff: "Easy" },
-    { name: "Seafood Special", cost: 1500, hours: 2, diff: "Easy" },
-    { name: "Bakery & Pastry Walk", cost: 300, hours: 1.5, diff: "Easy" },
-    { name: "Market-to-Plate Visit", cost: 1200, hours: 3, diff: "Medium" },
-    { name: "Chef's Table", cost: 3000, hours: 2.5, diff: "Hard" },
+    { name: "Street Food Tour", cost: 600, hours: 3, diff: "Easy", icon: "🌮" },
+    { name: "Fine Dining Experience", cost: 2500, hours: 2, diff: "Easy", icon: "🍽️" },
+    { name: "Cooking Class", cost: 1800, hours: 3.5, diff: "Medium", icon: "👨‍🍳" },
+    { name: "Night Food Market", cost: 500, hours: 3, diff: "Easy", icon: "🌙" },
+    { name: "Seafood Special", cost: 1500, hours: 2, diff: "Easy", icon: "🦞" },
+    { name: "Bakery & Pastry Walk", cost: 300, hours: 1.5, diff: "Easy", icon: "🥐" },
+    { name: "Market-to-Plate Visit", cost: 1200, hours: 3, diff: "Medium", icon: "🛒" },
+    { name: "Chef's Table", cost: 3000, hours: 2.5, diff: "Hard", icon: "⭐" },
+    { name: "Wine & Cheese Tasting", cost: 1400, hours: 2, diff: "Easy", icon: "🍷" },
+    { name: "Local Breakfast Spot", cost: 400, hours: 1.5, diff: "Easy", icon: "☕" },
   ],
   relax: [
-    { name: "Beach Day & Sunbathing", cost: 0, hours: 6, diff: "Easy" },
-    { name: "Luxury Spa & Massage", cost: 2000, hours: 3, diff: "Easy" },
-    { name: "Yoga & Meditation", cost: 1200, hours: 2, diff: "Easy" },
-    { name: "Resort Pool Day", cost: 1500, hours: 5, diff: "Easy" },
-    { name: "Countryside Drive", cost: 300, hours: 4, diff: "Easy" },
-    { name: "Stargazing Evening", cost: 0, hours: 2, diff: "Easy" },
-    { name: "Thermal Springs", cost: 1300, hours: 3, diff: "Easy" },
+    { name: "Beach Day & Sunbathing", cost: 0, hours: 6, diff: "Easy", icon: "🏖️" },
+    { name: "Luxury Spa & Massage", cost: 2000, hours: 3, diff: "Easy", icon: "💆" },
+    { name: "Yoga & Meditation", cost: 1200, hours: 2, diff: "Easy", icon: "🧘" },
+    { name: "Resort Pool Day", cost: 1500, hours: 5, diff: "Easy", icon: "🏊" },
+    { name: "Countryside Drive", cost: 300, hours: 4, diff: "Easy", icon: "🚗" },
+    { name: "Stargazing Evening", cost: 0, hours: 2, diff: "Easy", icon: "🌟" },
+    { name: "Thermal Springs", cost: 1300, hours: 3, diff: "Easy", icon: "♨️" },
+    { name: "Sunset Cruise", cost: 1800, hours: 2.5, diff: "Easy", icon: "🌇" },
+    { name: "Hammock & Reading", cost: 0, hours: 3, diff: "Easy", icon: "📚" },
   ],
 };
 
-/* ---------- helpers ---------- */
+const CATEGORY_META = {
+  adventure: { label: "Adventure", icon: "⛰️", color: "#f97316", bg: "#fff7ed" },
+  sightseeing: { label: "Sightseeing", icon: "🏛️", color: "#3b82f6", bg: "#eff6ff" },
+  food: { label: "Food & Drink", icon: "🍜", color: "#ef4444", bg: "#fff5f5" },
+  relax: { label: "Relaxation", icon: "🌴", color: "#10b981", bg: "#f0fdf4" },
+};
+
+const DIFF_COLOR = { Easy: "#10b981", Medium: "#f59e0b", Hard: "#ef4444" };
+
+/* ─── Helpers ───────────────────────────────────────────────────────── */
 function shuffle(a) {
   const arr = [...a];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -60,104 +79,115 @@ function shuffle(a) {
 }
 
 function formatINR(n) {
-  if (Number.isNaN(n) || !Number.isFinite(n)) return "₹0";
+  if (!n && n !== 0) return "₹0";
   return "₹" + Number(n).toLocaleString("en-IN");
 }
 
-/* pick unique activities; if not enough, fill with low-cost filler */
-function pickUnique(pool, required) {
-  const shuffled = shuffle(pool);
-  const chosen = [];
-  for (let i = 0; i < required; i++) {
-    if (i < shuffled.length) chosen.push(shuffled[i]);
-    else chosen.push({ name: "Free / Local exploration", cost: 0, hours: 3, diff: "Easy" });
-  }
-  return chosen;
+function formatCurrency(amount, currencyCode) {
+  if (!amount && amount !== 0) return CURRENCIES[currencyCode].symbol + "0";
+  const curr = CURRENCIES[currencyCode];
+  const converted = amount * curr.rate;
+  return curr.symbol + Number(converted).toLocaleString(undefined, { 
+    minimumFractionDigits: 0, 
+    maximumFractionDigits: 0 
+  });
 }
 
-/* create multiple activities per day (morning/afternoon/evening) without repeating across days */
+function getGoogleMapsLink(location, coordinates) {
+  if (coordinates) {
+    return `https://www.google.com/maps/search/?api=1&query=${coordinates.lat},${coordinates.lng}`;
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+}
+
 function buildDailySchedule(pool, days) {
-  // for variety, generate many unique activities and then slice per day
-  const need = days * 3; // 3 activities per day
-  const big = shuffle([...pool, ...pool, ...pool]); // replicate to increase pool
+  const need = days * 3;
+  const big = shuffle([...pool, ...pool, ...pool]);
   const unique = [];
   for (let i = 0; i < big.length && unique.length < need; i++) {
-    const name = big[i].name;
-    if (!unique.some((u) => u.name === name)) unique.push(big[i]);
+    if (!unique.some((u) => u.name === big[i].name)) unique.push(big[i]);
   }
-  // if still less, fill with free exploration
-  while (unique.length < need) unique.push({ name: "Free / Local exploration", cost: 0, hours: 3, diff: "Easy" });
-
-  // split into days
-  const daysArr = [];
-  for (let d = 0; d < days; d++) {
-    const slice = unique.slice(d * 3, d * 3 + 3);
-    daysArr.push(slice);
-  }
-  return daysArr;
+  while (unique.length < need)
+    unique.push({ name: "Free Exploration", cost: 0, hours: 3, diff: "Easy", icon: "🗺️" });
+  return Array.from({ length: days }, (_, d) => unique.slice(d * 3, d * 3 + 3));
 }
 
-/* ---------- Component ---------- */
+const SLOTS = ["🌅 Morning", "☀️ Afternoon", "🌙 Evening", "🌃 Night"];
+
+/* ─── Component ─────────────────────────────────────────────────────── */
 export default function TravelPlanner() {
+  const { user, incrementTrips } = useAuth();
   const [place, setPlace] = useState("");
   const [days, setDays] = useState(3);
   const [category, setCategory] = useState("sightseeing");
   const [budget, setBudget] = useState("");
-  const [itinerary, setItinerary] = useState([]); // array of days -> each day: array of activities
+  const [currency, setCurrency] = useState("USD");
+  const [travelers, setTravelers] = useState(1);
+  const [itinerary, setItinerary] = useState([]);
   const [total, setTotal] = useState(0);
-  const [msg, setMsg] = useState("");
+  const [msg, setMsg] = useState({ text: "", type: "" });
+  const [generated, setGenerated] = useState(false);
+  const [activeDay, setActiveDay] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [savedTrips, setSavedTrips] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const generate = (e) => {
     e && e.preventDefault();
-    const n = Math.max(1, Math.floor(Number(days) || 1));
+    const n = Math.max(1, Math.min(30, Math.floor(Number(days) || 1)));
     const userBudget = Math.max(0, Math.floor(Number(budget) || 0));
-    const pool = POOLS[category] || POOLS["sightseeing"];
-    const daysSchedule = buildDailySchedule(pool, n);
+    const t = Math.max(1, Math.floor(Number(travelers) || 1));
+    
+    // Try to find real destination data
+    const destData = findDestination(place);
+    
+    let dayObjects;
+    
+    if (destData && destData.dayPlans) {
+      // Use real day-by-day plans
+      const baseItinerary = buildItineraryFromDayPlans(destData, n);
+      
+      // Scale costs by travelers
+      dayObjects = baseItinerary.map(day => ({
+        ...day,
+        activities: day.activities.map(a => ({ ...a, cost: a.cost * t })),
+        dayCost: day.dayCost * t
+      }));
+    } else {
+      // Fallback to generic activities
+      const pool = POOLS[category] || POOLS.sightseeing;
+      const daysSchedule = buildDailySchedule(pool, n);
+      
+      dayObjects = daysSchedule.map((acts, idx) => {
+        const activities = acts.map((a) => ({ ...a }));
+        const activitiesCost = activities.reduce((s, a) => s + (a.cost || 0), 0) * t;
+        return { day: idx + 1, activities, dayCost: activitiesCost + 800 * t };
+      });
+    }
 
-    // compute per-day costs: activity cost + meals(₹500) + transport(₹300)
-    const dayObjects = daysSchedule.map((acts, idx) => {
-      const activities = acts.map((a) => ({ ...a }));
-      const activitiesCost = activities.reduce((s, a) => s + (a.cost || 0), 0);
-      const dayExtras = 800; // meals + transport
-      return {
-        day: idx + 1,
-        activities,
-        dayCost: activitiesCost + dayExtras,
-      };
-    });
-
+    // Budget optimization if needed
     let sum = dayObjects.reduce((s, d) => s + d.dayCost, 0);
 
-    // if user set a budget and sum > budget, attempt to lower expensive items
-    if (userBudget > 0 && sum > userBudget) {
-      // strategy: for days sorted by descending dayCost, try replacing the most expensive activity with cheapest available not already used
-      let usedNames = new Set();
-      dayObjects.forEach((d) => d.activities.forEach((a) => usedNames.add(a.name)));
-
-      const replacements = [...pool].sort((a, b) => a.cost - b.cost); // cheap -> expensive
-      // perform a few passes
+    if (userBudget > 0 && sum > userBudget && !destData?.dayPlans) {
+      // Only optimize generic activities, not curated day plans
+      const pool = POOLS[category] || POOLS.sightseeing;
+      const replacements = [...pool].sort((a, b) => a.cost - b.cost);
+      const usedNames = new Set(dayObjects.flatMap((d) => d.activities.map((a) => a.name)));
+      
       for (let pass = 0; pass < 5 && sum > userBudget; pass++) {
-        // find the day with largest excess (largest dayCost)
         dayObjects.sort((a, b) => b.dayCost - a.dayCost);
         let replaced = false;
         for (let d of dayObjects) {
-          // find the most expensive activity in that day (index)
-          let maxIdx = 0;
-          for (let i = 1; i < d.activities.length; i++) {
-            if ((d.activities[i].cost || 0) > (d.activities[maxIdx].cost || 0)) maxIdx = i;
-          }
-          // find the cheapest replacement not in usedNames
-          let rep = replacements.find((r) => !usedNames.has(r.name));
-          if (!rep) rep = { name: "Free / Local exploration", cost: 0, hours: 3, diff: "Easy" };
-          // if replacement is cheaper, do swap
+          let maxIdx = d.activities.reduce((mi, a, i) => (a.cost > d.activities[mi].cost ? i : mi), 0);
+          let rep = replacements.find((r) => !usedNames.has(r.name)) ||
+            { name: "Free Exploration", cost: 0, hours: 3, diff: "Easy", icon: "🗺️", description: "Explore the local area at your own pace" };
           if ((rep.cost || 0) < (d.activities[maxIdx].cost || 0)) {
-            // remove old from used, add new
             usedNames.delete(d.activities[maxIdx].name);
             usedNames.add(rep.name);
-            // adjust sum
-            sum = sum - (d.activities[maxIdx].cost || 0) + (rep.cost || 0);
+            sum -= (d.activities[maxIdx].cost || 0);
+            sum += (rep.cost || 0);
             d.activities[maxIdx] = { ...rep };
-            d.dayCost = d.activities.reduce((s, a) => s + (a.cost || 0), 0) + 800;
+            d.dayCost = d.activities.reduce((s, a) => s + (a.cost || 0), 0) + 800 * t;
             replaced = true;
             if (sum <= userBudget) break;
           }
@@ -166,126 +196,399 @@ export default function TravelPlanner() {
       }
     }
 
+    dayObjects.sort((a, b) => a.day - b.day);
     const finalTotal = dayObjects.reduce((s, d) => s + d.dayCost, 0);
     setItinerary(dayObjects);
     setTotal(finalTotal);
-    if (!budget) setMsg("No budget provided — showing suggested plan.");
-    else if (finalTotal <= Number(budget)) setMsg(`Great — fits within your budget of ${formatINR(Number(budget))}.`);
-    else setMsg(`Note: Plan exceeds your budget (${formatINR(Number(budget))}). We reduced costs where possible.`);
+    setGenerated(true);
+    setActiveDay(null);
+    
+    // Increment user's trip count
+    if (user) {
+      incrementTrips();
+    }
+
+    const hasRealPlan = destData && destData.dayPlans;
+    if (!budget) {
+      setMsg({ 
+        text: hasRealPlan 
+          ? `Curated ${n}-day plan for ${place} ready!` 
+          : "No budget set — showing a suggested plan.", 
+        type: "info" 
+      });
+    } else if (finalTotal <= Number(budget)) {
+      setMsg({ text: `Your plan fits within ${formatCurrency(Number(budget), currency)}!`, type: "success" });
+    } else {
+      setMsg({ text: `Plan slightly exceeds ${formatCurrency(Number(budget), currency)}. ${hasRealPlan ? 'This is a curated experience.' : 'We optimised where possible.'}`, type: "warn" });
+    }
   };
 
+  const reset = () => {
+    setItinerary([]);
+    setGenerated(false);
+    setMsg({ text: "", type: "" });
+    setTotal(0);
+    setActiveDay(null);
+  };
+
+  const copyPlan = () => {
+    if (!itinerary.length) return;
+    const lines = [`✈️ Trip to ${place} — ${days} days (${CATEGORY_META[category].label})\n`];
+    itinerary.forEach((d) => {
+      lines.push(`Day ${d.day}:`);
+      d.activities.forEach((a, i) => lines.push(`  ${SLOTS[i]}: ${a.icon} ${a.name} (${formatINR(a.cost)}, ${a.hours}h)`));
+      lines.push(`  Day Total: ${formatINR(d.dayCost)}\n`);
+    });
+    lines.push(`Grand Total: ${formatINR(total)}`);
+    navigator.clipboard.writeText(lines.join("\n")).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const saveTrip = () => {
+    if (!itinerary.length) return;
+    const trip = {
+      id: Date.now(),
+      place,
+      days,
+      category,
+      budget,
+      travelers,
+      itinerary,
+      total,
+      savedAt: new Date().toISOString(),
+    };
+    const saved = [...savedTrips, trip];
+    setSavedTrips(saved);
+    if (user) {
+      localStorage.setItem(`trips_${user.id}`, JSON.stringify(saved));
+    }
+    alert("Trip saved successfully!");
+  };
+
+  const budgetPct = budget ? Math.min(100, (total / Number(budget)) * 100) : 0;
+  const overBudget = budget && total > Number(budget);
+  const catMeta = CATEGORY_META[category];
+
   return (
-    <div className="tp-root-2">
-      <header className="tp-header-2">
-        <div className="tp-header-inner">
-          <h1>✈️ Smart Travel Planner</h1>
-          <p className="sub">Enter destination, days, budget (₹) and type — we’ll create a varied day-by-day plan.</p>
+    <div className="tp-root">
+      {/* ── Navbar ── */}
+      <nav className="tp-nav">
+        <div className="tp-nav-inner">
+          <div className="tp-logo">
+            <span className="tp-logo-icon">✈️</span>
+            <span className="tp-logo-text">TravelCraft</span>
+          </div>
+          <div className="tp-nav-links">
+            <span className="tp-nav-badge">Smart Planner</span>
+            {user && <UserProfile />}
+          </div>
         </div>
-      </header>
+      </nav>
 
-      <main className="tp-main-2">
-        <form className="tp-form-2" onSubmit={generate}>
-          <div className="row">
-            <label>
-              <div className="label-title">📍 Destination</div>
-              <input value={place} onChange={(e) => setPlace(e.target.value)} placeholder="e.g., Amsterdam" required />
-            </label>
+      {/* ── Hero ── */}
+      <section className="tp-hero">
+        <div className="tp-hero-inner">
+          <h1 className="tp-hero-title">Plan Your Perfect Trip</h1>
+          <p className="tp-hero-sub">
+            Enter your destination, budget & preferences — get a personalised day-by-day itinerary instantly.
+          </p>
+        </div>
+      </section>
 
-            <label>
-              <div className="label-title">🗓 Days</div>
-              <input type="number" min="1" value={days} onChange={(e) => setDays(e.target.value)} required />
-            </label>
+      {/* ── Form Card ── */}
+      <main className="tp-main">
+        <div className="tp-form-card">
+          <form onSubmit={generate}>
+            <div className="tp-form-grid">
+              {/* Destination */}
+              <div className="tp-field">
+                <label className="tp-label">📍 Destination</label>
+                <div className="tp-autocomplete-wrap">
+                  <input
+                    className="tp-input"
+                    value={place}
+                    onChange={(e) => {
+                      setPlace(e.target.value);
+                      setShowSuggestions(e.target.value.length > 0);
+                    }}
+                    onFocus={() => setShowSuggestions(place.length > 0)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    placeholder="e.g. Goa, Paris, Bali"
+                    required
+                  />
+                  {showSuggestions && (
+                    <div className="tp-suggestions">
+                      {getDestinationNames()
+                        .filter(name => name.toLowerCase().includes(place.toLowerCase()))
+                        .slice(0, 5)
+                        .map(name => (
+                          <div
+                            key={name}
+                            className="tp-suggestion-item"
+                            onClick={() => {
+                              setPlace(name);
+                              setShowSuggestions(false);
+                            }}
+                          >
+                            📍 {name}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </div>
 
-            <label>
-              <div className="label-title">🎯 Category</div>
-              <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option value="adventure">Adventure</option>
-                <option value="sightseeing">Sightseeing</option>
-                <option value="food">Food</option>
-                <option value="relax">Relaxation</option>
-              </select>
-            </label>
-
-            <label>
-              <div className="label-title">💰 Budget (₹)</div>
-              <input type="number" min="0" value={budget} onChange={(e) => setBudget(e.target.value)} placeholder="e.g., 50000" />
-            </label>
-          </div>
-
-          <div className="form-actions">
-            <button className="generate-btn">🚀 Generate Itinerary</button>
-          </div>
-        </form>
-
-        <section className="tp-output-2">
-          <div className="summary-row">
-            <div className="summary-card">
-              <div className="small">Destination</div>
-              <div className="big">{place || "—"}</div>
-            </div>
-            <div className="summary-card">
-              <div className="small">Days</div>
-              <div className="big">{itinerary.length || days || "—"}</div>
-            </div>
-            <div className="summary-card">
-              <div className="small">Category</div>
-              <div className="big">{category}</div>
-            </div>
-            <div className="summary-card">
-              <div className="small">Budget</div>
-              <div className="big">{budget ? formatINR(Number(budget)) : "—"}</div>
-            </div>
-          </div>
-
-          <div className="message">{msg}</div>
-
-          {budget && (
-            <div className="progress-wrap">
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{
-                    width: `${Math.min(100, (total / (Number(budget) || 1)) * 100)}%`,
-                    background: total > Number(budget) ? "#ef4444" : "#10b981",
-                  }}
+              {/* Days */}
+              <div className="tp-field">
+                <label className="tp-label">🗓️ Number of Days</label>
+                <input
+                  className="tp-input"
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={days}
+                  onChange={(e) => setDays(e.target.value)}
+                  required
                 />
               </div>
-              <div className="progress-text">{formatINR(total)} estimated — {budget ? `${Math.round((total / Number(budget)) * 100)}% of budget` : ""}</div>
-            </div>
-          )}
 
-          <div className="days-grid">
-            {itinerary.length === 0 ? (
-              <div className="placeholder">No plan yet — fill the form and click Generate</div>
-            ) : (
-              itinerary.map((day) => (
-                <article key={day.day} className={`day-card cat-${category}`}>
-                  <div className="day-left">
-                    <div className="day-num">Day {day.day}</div>
-                    <div className="activities">
+              {/* Travelers */}
+              <div className="tp-field">
+                <label className="tp-label">👥 Travelers</label>
+                <input
+                  className="tp-input"
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={travelers}
+                  onChange={(e) => setTravelers(e.target.value)}
+                />
+              </div>
+
+              {/* Currency */}
+              <div className="tp-field">
+                <label className="tp-label">💱 Currency</label>
+                <select
+                  className="tp-input tp-select"
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                >
+                  {Object.entries(CURRENCIES).map(([code, curr]) => (
+                    <option key={code} value={code}>
+                      {curr.symbol} {curr.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Budget */}
+              <div className="tp-field">
+                <label className="tp-label">💰 Total Budget ({CURRENCIES[currency].symbol})</label>
+                <input
+                  className="tp-input"
+                  type="number"
+                  min="0"
+                  value={budget}
+                  onChange={(e) => setBudget(e.target.value)}
+                  placeholder={`e.g. ${currency === 'INR' ? '50000' : currency === 'USD' ? '600' : '500'}`}
+                />
+              </div>
+            </div>
+
+            {/* Category Picker */}
+            <div className="tp-cat-section">
+              <label className="tp-label">🎯 Trip Style</label>
+              <div className="tp-cat-grid">
+                {Object.entries(CATEGORY_META).map(([key, meta]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className={`tp-cat-btn ${category === key ? "active" : ""}`}
+                    style={category === key ? { borderColor: meta.color, background: meta.bg, color: meta.color } : {}}
+                    onClick={() => setCategory(key)}
+                  >
+                    <span className="tp-cat-icon">{meta.icon}</span>
+                    <span className="tp-cat-label">{meta.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="tp-form-actions">
+              {generated && (
+                <button type="button" className="tp-btn-secondary" onClick={reset}>
+                  🔄 Reset
+                </button>
+              )}
+              <button className="tp-btn-primary" type="submit">
+                🚀 Generate Itinerary
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* ── Results ── */}
+        {generated && (
+          <div className="tp-results">
+            {/* Stats Row */}
+            <div className="tp-stats-row">
+              {[
+                { label: "Destination", value: place || "—", icon: "📍" },
+                { label: "Duration", value: `${itinerary.length} days`, icon: "🗓️" },
+                { label: "Travelers", value: travelers, icon: "👥" },
+                { label: "Trip Style", value: catMeta.label, icon: catMeta.icon },
+                { label: "Est. Total", value: formatCurrency(total, currency), icon: "💰" },
+              ].map((s) => (
+                <div className="tp-stat-card" key={s.label}>
+                  <div className="tp-stat-icon">{s.icon}</div>
+                  <div className="tp-stat-label">{s.label}</div>
+                  <div className="tp-stat-value">{s.value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Message */}
+            {msg.text && (
+              <div className={`tp-msg tp-msg-${msg.type}`}>
+                {msg.type === "success" && "✅ "}
+                {msg.type === "warn" && "⚠️ "}
+                {msg.type === "info" && "ℹ️ "}
+                {msg.text}
+              </div>
+            )}
+
+            {/* Budget Progress */}
+            {budget && (
+              <div className="tp-budget-bar-wrap">
+                <div className="tp-budget-bar-header">
+                  <span>Budget Usage</span>
+                  <span style={{ color: overBudget ? "#ef4444" : "#10b981", fontWeight: 700 }}>
+                    {formatCurrency(total, currency)} / {formatCurrency(Number(budget), currency)}
+                  </span>
+                </div>
+                <div className="tp-budget-track">
+                  <div
+                    className="tp-budget-fill"
+                    style={{
+                      width: `${budgetPct}%`,
+                      background: overBudget
+                        ? "linear-gradient(90deg,#ef4444,#dc2626)"
+                        : "linear-gradient(90deg,#10b981,#059669)",
+                    }}
+                  />
+                </div>
+                <div className="tp-budget-pct">{Math.round(budgetPct)}% used</div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="tp-result-actions">
+              <button className="tp-action-btn" onClick={copyPlan}>
+                {copied ? "✅ Copied!" : "📋 Copy Plan"}
+              </button>
+              {user && (
+                <button className="tp-action-btn" onClick={saveTrip}>
+                  💾 Save Trip
+                </button>
+              )}
+              <button className="tp-action-btn" onClick={generate}>
+                🔀 Regenerate
+              </button>
+            </div>
+
+            {/* Day Cards */}
+            <div className="tp-days-grid">
+              {itinerary.map((day, di) => (
+                <div
+                  key={day.day}
+                  className={`tp-day-card cat-${category} ${activeDay === day.day ? "expanded" : ""}`}
+                  style={{ animationDelay: `${di * 0.07}s` }}
+                  onClick={() => setActiveDay(activeDay === day.day ? null : day.day)}
+                >
+                  <div className="tp-day-header">
+                    <div className="tp-day-badge" style={{ background: catMeta.color }}>
+                      Day {day.day}
+                    </div>
+                    <div className="tp-day-cost">{formatCurrency(day.dayCost, currency)}</div>
+                    <div className="tp-day-chevron">{activeDay === day.day ? "▲" : "▼"}</div>
+                  </div>
+
+                  <div className="tp-day-preview">
+                    {day.activities.map((a) => a.icon).join("  ")}
+                    <span className="tp-day-preview-names">
+                      {day.activities.map((a) => a.name).join(" · ")}
+                    </span>
+                  </div>
+
+                  {activeDay === day.day && (
+                    <div className="tp-day-body">
                       {day.activities.map((a, i) => (
-                        <div key={i} className="activity-row">
-                          <div className="act-name">{a.name}</div>
-                          <div className="act-meta">
-                            <span className="hours">{a.hours}h</span>
-                            <span className="diff">{a.diff}</span>
+                        <div className="tp-activity" key={i}>
+                          <div className="tp-activity-slot">{SLOTS[i]}</div>
+                          <div className="tp-activity-info">
+                            <div className="tp-activity-header">
+                              <div className="tp-activity-name">
+                                {a.icon} {a.name}
+                              </div>
+                              {a.location && (
+                                <a
+                                  href={getGoogleMapsLink(a.location, a.coordinates)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="tp-maps-link"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  🗺️ Directions
+                                </a>
+                              )}
+                            </div>
+                            {a.location && (
+                              <div className="tp-activity-location">📍 {a.location}</div>
+                            )}
+                            {a.description && (
+                              <div className="tp-activity-description">{a.description}</div>
+                            )}
+                            <div className="tp-activity-meta">
+                              <span className="tp-tag tp-tag-cost">{formatCurrency(a.cost, currency)}</span>
+                              <span className="tp-tag tp-tag-hours">⏱ {a.hours}h</span>
+                              <span
+                                className="tp-tag tp-tag-diff"
+                                style={{ background: DIFF_COLOR[a.diff] + "22", color: DIFF_COLOR[a.diff] }}
+                              >
+                                {a.diff}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       ))}
+                      <div className="tp-day-footer">
+                        <span>🍽️ Meals + 🚌 Transport included</span>
+                        <span className="tp-day-total">Day Total: {formatCurrency(day.dayCost, currency)}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="day-right">
-                    <div className="day-cost">{formatINR(day.dayCost)}</div>
-                    <div className="day-sub">incl. meals & transport</div>
-                  </div>
-                </article>
-              ))
-            )}
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </section>
+        )}
       </main>
 
-      <footer className="tp-footer-2">Made with ❤️ — sample planner (expand pools or wire APIs for real data)</footer>
+      <footer className="tp-footer">
+        <div className="tp-footer-content">
+          <div className="tp-footer-section">
+            <span className="tp-footer-icon">✈️</span>
+            <span>Made with ❤️ by TravelCraft</span>
+          </div>
+          <div className="tp-footer-divider">·</div>
+          <div className="tp-footer-section">
+            <span className="tp-footer-icon">💡</span>
+            <span>Pro Tip: Book flights on Tuesdays for best deals</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
