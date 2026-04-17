@@ -112,8 +112,24 @@ export const AuthProvider = ({ children }) => {
     updateProfile({ tripsPlanned });
   };
 
+  // Reset password — verifies email exists, stores new password
+  const resetPassword = (email, newPassword) => {
+    const users = JSON.parse(localStorage.getItem("travelcraft_users") || "[]");
+    const idx = users.findIndex((u) => u.email === email);
+    if (idx === -1) return { success: false, error: "No account found with this email." };
+    users[idx].password = newPassword;
+    localStorage.setItem("travelcraft_users", JSON.stringify(users));
+    return { success: true };
+  };
+
+  // Check if email is registered
+  const checkEmail = (email) => {
+    const users = JSON.parse(localStorage.getItem("travelcraft_users") || "[]");
+    return !!users.find((u) => u.email === email);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, updateProfile, incrementTrips, loading }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, updateProfile, incrementTrips, resetPassword, checkEmail, loading }}>
       {children}
     </AuthContext.Provider>
   );
