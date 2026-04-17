@@ -50,8 +50,8 @@ A beautiful, feature-rich travel planning application built with React. Plan you
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd Travel-Planner-1
+   git clone https://github.com/ESpoorthy/Travel-Planner.git
+   cd Travel-Planner
    ```
 
 2. **Install dependencies**
