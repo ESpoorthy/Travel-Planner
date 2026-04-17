@@ -129,7 +129,6 @@ export default function TravelPlanner() {
   const [generated, setGenerated] = useState(false);
   const [activeDay, setActiveDay] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [savedTrips, setSavedTrips] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const generate = (e) => {
@@ -273,17 +272,18 @@ export default function TravelPlanner() {
       days,
       category,
       budget,
+      currency,
       travelers,
       itinerary,
       total,
       savedAt: new Date().toISOString(),
     };
-    const saved = [...savedTrips, trip];
-    setSavedTrips(saved);
+    const existing = JSON.parse(localStorage.getItem(`trips_${user?.id}`) || "[]");
+    const saved = [...existing, trip];
     if (user) {
       localStorage.setItem(`trips_${user.id}`, JSON.stringify(saved));
     }
-    alert("Trip saved successfully!");
+    alert("Trip saved! View it in Saved Trips from your profile.");
   };
 
   const curr = CURRENCIES[currency];
@@ -304,7 +304,7 @@ export default function TravelPlanner() {
           </div>
           <div className="tp-nav-links">
             <span className="tp-nav-badge">Smart Planner</span>
-            {user && <UserProfile />}
+            {user && <UserProfile onSelectDestination={(dest) => { setPlace(dest); setShowSuggestions(false); }} />}
           </div>
         </div>
       </nav>
