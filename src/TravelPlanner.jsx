@@ -135,91 +135,110 @@ export default function TravelPlanner() {
   const generate = (e) => {
     e && e.preventDefault();
     const n = Math.max(1, Math.min(30, Math.floor(Number(days) || 1)));
-    const userBudget = Math.max(0, Math.floor(Number(budget) || 0));
     const t = Math.max(1, Math.floor(Number(travelers) || 1));
-    
-    // Try to find real destination data
+
+    // Convert user budget to INR (all internal costs are in INR)
+    const curr = CURRENCIES[currency];
+    const userBudgetInCurrency = Math.max(0, Number(budget) || 0);
+    // budget is entered in selected currency → convert to INR for comparison
+    const userBudgetINR = userBudgetInCurrency > 0
+      ? Math.round((userBudgetInCurrency / curr.rate) * 83) // to INR
+      : 0;
+
     const destData = findDestination(place);
-    
+
     let dayObjects;
-    
+
     if (destData && destData.dayPlans) {
-      // Use real day-by-day plans
       const baseItinerary = buildItineraryFromDayPlans(destData, n);
-      
-      // Scale costs by travelers
-      dayObjects = baseItinerary.map(day => ({
-        ...day,
-        activities: day.activities.map(a => ({ ...a, cost: a.cost * t })),
-        dayCost: day.dayCost * t
-      }));
-    } else {
-      // Fallback to generic activities
-      const pool = POOLS[category] || POOLS.sightseeing;
-      const daysSchedule = buildDailySchedule(pool, n);
-      
-      dayObjects = daysSchedule.map((acts, idx) => {
-        const activities = acts.map((a) => ({ ...a }));
-        const activitiesCost = activities.reduce((s, a) => s + (a.cost || 0), 0) * t;
-        return { day: idx + 1, activities, dayCost: activitiesCost + 800 * t };
-      });
-    }
 
-    // Budget optimization if needed
-    let sum = dayObjects.reduce((s, d) => s + d.dayCost, 0);
+      if (userBudgetINR > 0) {
+        const budgetPerDay = Math.floor(userBudgetINR / n);          // INR per day
+        const mealsTransport = Math.min(300, Math.floor(budgetPerDay * 0.2)); // 20% for meals+transport, max ₹300
 
-    if (userBudget > 0 && sum > userBudget && !destData?.dayPlans) {
-      // Only optimize generic activities, not curated day plans
-      const pool = POOLS[category] || POOLS.sightseeing;
-      const replacements = [...pool].sort((a, b) => a.cost - b.cost);
-      const usedNames = new Set(dayObjects.flatMap((d) => d.activities.map((a) => a.name)));
-      
-      for (let pass = 0; pass < 5 && sum > userBudget; pass++) {
-        dayObjects.sort((a, b) => b.dayCost - a.dayCost);
-        let replaced = false;
-        for (let d of dayObjects) {
-          let maxIdx = d.activities.reduce((mi, a, i) => (a.cost > d.activities[mi].cost ? i : mi), 0);
-          let rep = replacements.find((r) => !usedNames.has(r.name)) ||
-            { name: "Free Exploration", cost: 0, hours: 3, diff: "Easy", icon: "🗺️", description: "Explore the local area at your own pace" };
-          if ((rep.cost || 0) < (d.activities[maxIdx].cost || 0)) {
-            usedNames.delete(d.activities[maxIdx].name);
-            usedNames.add(rep.name);
-            sum -= (d.activities[maxIdx].cost || 0);
-            sum += (rep.cost || 0);
-            d.activities[maxIdx] = { ...rep };
-            d.dayCost = d.activities.reduce((s, a) => s + (a.cost || 0), 0) + 800 * t;
-            replaced = true;
-            if (sum <= userBudget) break;
+        dayObjects = baseItinerary.map(day => {
+          let activityBudget = budgetPerDay - mealsTransport;
+          // Sort activities cheapest first so we always include something
+          const sorted = [...day.activities].sort((a, b) => (a.cost || 0) - (b.cost || 0));
+          const picked = [];
+          let spent = 0;
+          for (const act of sorted) {
+            const actCost = (act.cost || 0) * t;
+            if (spent + actCost <= activityBudget || picked.length === 0) {
+              picked.push({ ...act, cost: act.cost || 0 });
+              spent += actCost;
+            } else {
+              // Replace with a free/cheap version of the same slot
+              picked.push({
+                ...act,
+                cost: 0,
+                name: `${act.name} (self-guided / free entry)`,
+                description: act.description + " — Free/self-guided visit to stay within budget."
+              });
+            }
           }
-        }
-        if (!replaced) break;
+          const dayCost = picked.reduce((s, a) => s + (a.cost || 0), 0) * t + mealsTransport * t;
+          return { day: day.day, activities: picked, dayCost };
+        });
+      } else {
+        // No budget — show full curated plan
+        dayObjects = baseItinerary.map(day => ({
+          ...day,
+          activities: day.activities.map(a => ({ ...a })),
+          dayCost: day.dayCost * t
+        }));
+      }
+    } else {
+      // Generic pool fallback
+      const pool = POOLS[category] || POOLS.sightseeing;
+
+      if (userBudgetINR > 0) {
+        const budgetPerDay = Math.floor(userBudgetINR / n);
+        const mealsTransport = Math.min(300, Math.floor(budgetPerDay * 0.2));
+        const actBudgetPerDay = budgetPerDay - mealsTransport;
+
+        // Filter pool to only activities that fit per-day activity budget
+        const affordable = pool
+          .filter(a => (a.cost || 0) * t <= actBudgetPerDay)
+          .sort((a, b) => (b.cost || 0) - (a.cost || 0)); // best value first
+
+        const fallbackPool = affordable.length >= 3 ? affordable : pool.sort((a, b) => a.cost - b.cost);
+        const daysSchedule = buildDailySchedule(fallbackPool, n);
+
+        dayObjects = daysSchedule.map((acts, idx) => {
+          const activities = acts.map(a => ({ ...a }));
+          const dayCost = activities.reduce((s, a) => s + (a.cost || 0), 0) * t + mealsTransport * t;
+          return { day: idx + 1, activities, dayCost };
+        });
+      } else {
+        const daysSchedule = buildDailySchedule(pool, n);
+        dayObjects = daysSchedule.map((acts, idx) => {
+          const activities = acts.map(a => ({ ...a }));
+          const dayCost = activities.reduce((s, a) => s + (a.cost || 0), 0) * t + 300 * t;
+          return { day: idx + 1, activities, dayCost };
+        });
       }
     }
 
     dayObjects.sort((a, b) => a.day - b.day);
-    const finalTotal = dayObjects.reduce((s, d) => s + d.dayCost, 0);
+    const finalTotalINR = dayObjects.reduce((s, d) => s + d.dayCost, 0);
+    // Convert final total back to selected currency for display
+    const finalTotalDisplay = Math.round((finalTotalINR / 83) * curr.rate);
+
     setItinerary(dayObjects);
-    setTotal(finalTotal);
+    setTotal(finalTotalINR);
     setGenerated(true);
     setActiveDay(null);
-    
-    // Increment user's trip count
-    if (user) {
-      incrementTrips();
-    }
 
-    const hasRealPlan = destData && destData.dayPlans;
+    if (user) incrementTrips();
+
+    const hasRealPlan = !!(destData && destData.dayPlans);
     if (!budget) {
-      setMsg({ 
-        text: hasRealPlan 
-          ? `Curated ${n}-day plan for ${place} ready!` 
-          : "No budget set — showing a suggested plan.", 
-        type: "info" 
-      });
-    } else if (finalTotal <= Number(budget)) {
-      setMsg({ text: `Your plan fits within ${formatCurrency(Number(budget), currency)}!`, type: "success" });
+      setMsg({ text: hasRealPlan ? `Curated ${n}-day plan for ${place} ready!` : "No budget set — showing a suggested plan.", type: "info" });
+    } else if (finalTotalINR <= userBudgetINR) {
+      setMsg({ text: `✅ Plan fits within your ${formatCurrency(userBudgetInCurrency, currency)} budget!`, type: "success" });
     } else {
-      setMsg({ text: `Plan slightly exceeds ${formatCurrency(Number(budget), currency)}. ${hasRealPlan ? 'This is a curated experience.' : 'We optimised where possible.'}`, type: "warn" });
+      setMsg({ text: `⚠️ Estimated ${formatCurrency(finalTotalDisplay, currency)} — slightly over budget. Expensive activities marked as self-guided.`, type: "warn" });
     }
   };
 
@@ -267,8 +286,11 @@ export default function TravelPlanner() {
     alert("Trip saved successfully!");
   };
 
-  const budgetPct = budget ? Math.min(100, (total / Number(budget)) * 100) : 0;
-  const overBudget = budget && total > Number(budget);
+  const curr = CURRENCIES[currency];
+  const userBudgetInCurrency = Number(budget) || 0;
+  const userBudgetINR = userBudgetInCurrency > 0 ? Math.round((userBudgetInCurrency / curr.rate) * 83) : 0;
+  const budgetPct = userBudgetINR > 0 ? Math.min(100, (total / userBudgetINR) * 100) : 0;
+  const overBudget = userBudgetINR > 0 && total > userBudgetINR;
   const catMeta = CATEGORY_META[category];
 
   return (
@@ -439,7 +461,7 @@ export default function TravelPlanner() {
                 { label: "Duration", value: `${itinerary.length} days`, icon: "🗓️" },
                 { label: "Travelers", value: travelers, icon: "👥" },
                 { label: "Trip Style", value: catMeta.label, icon: catMeta.icon },
-                { label: "Est. Total", value: formatCurrency(total, currency), icon: "💰" },
+                { label: "Est. Total", value: formatCurrency(Math.round((total / 83) * curr.rate), currency), icon: "💰" },
               ].map((s) => (
                 <div className="tp-stat-card" key={s.label}>
                   <div className="tp-stat-icon">{s.icon}</div>
@@ -465,7 +487,7 @@ export default function TravelPlanner() {
                 <div className="tp-budget-bar-header">
                   <span>Budget Usage</span>
                   <span style={{ color: overBudget ? "#ef4444" : "#10b981", fontWeight: 700 }}>
-                    {formatCurrency(total, currency)} / {formatCurrency(Number(budget), currency)}
+                    {formatCurrency(Math.round((total / 83) * curr.rate), currency)} / {formatCurrency(userBudgetInCurrency, currency)}
                   </span>
                 </div>
                 <div className="tp-budget-track">
@@ -479,7 +501,7 @@ export default function TravelPlanner() {
                     }}
                   />
                 </div>
-                <div className="tp-budget-pct">{Math.round(budgetPct)}% used</div>
+                <div className="tp-budget-pct">{Math.round(budgetPct)}% of budget used · {formatCurrency(userBudgetInCurrency, currency)} total budget for {days} days</div>
               </div>
             )}
 
@@ -511,7 +533,7 @@ export default function TravelPlanner() {
                     <div className="tp-day-badge" style={{ background: catMeta.color }}>
                       Day {day.day}
                     </div>
-                    <div className="tp-day-cost">{formatCurrency(day.dayCost, currency)}</div>
+                    <div className="tp-day-cost">{formatCurrency(Math.round((day.dayCost / 83) * curr.rate), currency)}</div>
                     <div className="tp-day-chevron">{activeDay === day.day ? "▲" : "▼"}</div>
                   </div>
 
@@ -551,7 +573,7 @@ export default function TravelPlanner() {
                               <div className="tp-activity-description">{a.description}</div>
                             )}
                             <div className="tp-activity-meta">
-                              <span className="tp-tag tp-tag-cost">{formatCurrency(a.cost, currency)}</span>
+                              <span className="tp-tag tp-tag-cost">{formatCurrency(Math.round((a.cost / 83) * curr.rate), currency)}</span>
                               <span className="tp-tag tp-tag-hours">⏱ {a.hours}h</span>
                               <span
                                 className="tp-tag tp-tag-diff"
@@ -565,7 +587,7 @@ export default function TravelPlanner() {
                       ))}
                       <div className="tp-day-footer">
                         <span>🍽️ Meals + 🚌 Transport included</span>
-                        <span className="tp-day-total">Day Total: {formatCurrency(day.dayCost, currency)}</span>
+                        <span className="tp-day-total">Day Total: {formatCurrency(Math.round((day.dayCost / 83) * curr.rate), currency)}</span>
                       </div>
                     </div>
                   )}
