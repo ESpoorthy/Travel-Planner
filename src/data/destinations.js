@@ -19,7 +19,7 @@ export const DESTINATIONS = {
         },
         afternoon: {
           name: "Lunch at Paradise Biryani (Original)",
-          cost: 600,
+          cost: 350,
           hours: 1.5,
           diff: "Easy",
           icon: "🍛",
@@ -29,7 +29,7 @@ export const DESTINATIONS = {
         },
         evening: {
           name: "Boating at Durgam Cheruvu (Secret Lake)",
-          cost: 200,
+          cost: 100,
           hours: 2,
           diff: "Easy",
           icon: "🚣",
@@ -39,7 +39,7 @@ export const DESTINATIONS = {
         },
         night: {
           name: "Dinner at Tatva (Aesthetic Telugu Restaurant)",
-          cost: 1200,
+          cost: 600,
           hours: 2,
           diff: "Easy",
           icon: "🍽️",
@@ -81,7 +81,7 @@ export const DESTINATIONS = {
         },
         night: {
           name: "Midnight Charminar Exploration & Street Food",
-          cost: 300,
+          cost: 200,
           hours: 2,
           diff: "Easy",
           icon: "🌙",
@@ -93,7 +93,7 @@ export const DESTINATIONS = {
       3: {
         morning: {
           name: "Irani Chai & Osmania Biscuits Breakfast",
-          cost: 100,
+          cost: 50,
           hours: 1,
           diff: "Easy",
           icon: "☕",
@@ -113,7 +113,7 @@ export const DESTINATIONS = {
         },
         evening: {
           name: "Hussain Sagar Lake & Buddha Statue",
-          cost: 150,
+          cost: 100,
           hours: 2,
           diff: "Easy",
           icon: "⛵",
@@ -123,7 +123,7 @@ export const DESTINATIONS = {
         },
         night: {
           name: "Dinner at Shah Ghouse Cafe",
-          cost: 500,
+          cost: 300,
           hours: 1.5,
           diff: "Easy",
           icon: "🍖",
@@ -135,7 +135,7 @@ export const DESTINATIONS = {
       4: {
         morning: {
           name: "Golconda Fort Exploration",
-          cost: 200,
+          cost: 100,
           hours: 3,
           diff: "Medium",
           icon: "🏰",
@@ -145,7 +145,7 @@ export const DESTINATIONS = {
         },
         afternoon: {
           name: "Qutb Shahi Tombs & Lunch at Bawarchi",
-          cost: 700,
+          cost: 400,
           hours: 3,
           diff: "Easy",
           icon: "⚱️",
@@ -155,7 +155,7 @@ export const DESTINATIONS = {
         },
         evening: {
           name: "Ramoji Film City Tour",
-          cost: 1500,
+          cost: 800,
           hours: 5,
           diff: "Easy",
           icon: "🎬",
@@ -165,7 +165,7 @@ export const DESTINATIONS = {
         },
         night: {
           name: "Dinner at Jewel of Nizam (Falaknuma Palace)",
-          cost: 3000,
+          cost: 1500,
           hours: 2,
           diff: "Easy",
           icon: "👑",
@@ -187,7 +187,7 @@ export const DESTINATIONS = {
         },
         afternoon: {
           name: "Lunch at Cafe Bahar & Necklace Road",
-          cost: 600,
+          cost: 350,
           hours: 3,
           diff: "Easy",
           icon: "🍴",
@@ -207,7 +207,7 @@ export const DESTINATIONS = {
         },
         night: {
           name: "Farewell Dinner at Ohri's Gufaa",
-          cost: 1000,
+          cost: 500,
           hours: 2,
           diff: "Easy",
           icon: "🍽️",
@@ -237,7 +237,7 @@ export const DESTINATIONS = {
         },
         afternoon: {
           name: "Lunch at Britto's & Beach Activities",
-          cost: 800,
+          cost: 400,
           hours: 3,
           diff: "Easy",
           icon: "🍤",
@@ -247,7 +247,7 @@ export const DESTINATIONS = {
         },
         evening: {
           name: "Fort Aguada Sunset & Lighthouse",
-          cost: 100,
+          cost: 50,
           hours: 2,
           diff: "Easy",
           icon: "🏰",
@@ -257,7 +257,7 @@ export const DESTINATIONS = {
         },
         night: {
           name: "Tito's Lane Nightlife Experience",
-          cost: 1500,
+          cost: 800,
           hours: 3,
           diff: "Easy",
           icon: "🎉",
