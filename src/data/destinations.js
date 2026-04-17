@@ -489,18 +489,18 @@ export const DESTINATIONS = {
   }
 };
 
-// Currency conversion rates (base: USD)
+// Currency conversion rates (base: INR — all activity costs stored in INR)
 export const CURRENCIES = {
-  USD: { symbol: "$", name: "US Dollar", rate: 1 },
-  EUR: { symbol: "€", name: "Euro", rate: 0.92 },
-  GBP: { symbol: "£", name: "British Pound", rate: 0.79 },
-  INR: { symbol: "₹", name: "Indian Rupee", rate: 83 },
-  JPY: { symbol: "¥", name: "Japanese Yen", rate: 149 },
-  AUD: { symbol: "A$", name: "Australian Dollar", rate: 1.52 },
-  CAD: { symbol: "C$", name: "Canadian Dollar", rate: 1.36 },
-  AED: { symbol: "د.إ", name: "UAE Dirham", rate: 3.67 },
-  SGD: { symbol: "S$", name: "Singapore Dollar", rate: 1.34 },
-  CNY: { symbol: "¥", name: "Chinese Yuan", rate: 7.24 }
+  INR: { symbol: "₹", name: "Indian Rupee",      rate: 1 },
+  USD: { symbol: "$", name: "US Dollar",          rate: 0.012 },
+  EUR: { symbol: "€", name: "Euro",               rate: 0.011 },
+  GBP: { symbol: "£", name: "British Pound",      rate: 0.0095 },
+  JPY: { symbol: "¥", name: "Japanese Yen",       rate: 1.79 },
+  AUD: { symbol: "A$", name: "Australian Dollar", rate: 0.018 },
+  CAD: { symbol: "C$", name: "Canadian Dollar",   rate: 0.016 },
+  AED: { symbol: "د.إ", name: "UAE Dirham",       rate: 0.044 },
+  SGD: { symbol: "S$", name: "Singapore Dollar",  rate: 0.016 },
+  CNY: { symbol: "¥", name: "Chinese Yuan",       rate: 0.087 },
 };
 
 // Helper to find destination by name

@@ -83,14 +83,22 @@ function formatINR(n) {
   return "₹" + Number(n).toLocaleString("en-IN");
 }
 
-function formatCurrency(amount, currencyCode) {
-  if (!amount && amount !== 0) return CURRENCIES[currencyCode].symbol + "0";
+function formatCurrency(amountINR, currencyCode) {
+  if (!amountINR && amountINR !== 0) return CURRENCIES[currencyCode].symbol + "0";
   const curr = CURRENCIES[currencyCode];
-  const converted = amount * curr.rate;
-  return curr.symbol + Number(converted).toLocaleString(undefined, { 
-    minimumFractionDigits: 0, 
-    maximumFractionDigits: 0 
+  const converted = amountINR * curr.rate;
+  // For currencies with large values (JPY) show 0 decimals, others too
+  return curr.symbol + Number(converted).toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: curr.rate < 0.1 ? 2 : 0,
   });
+}
+
+// Convert user-entered budget (in their currency) → INR
+function toINR(amount, currencyCode) {
+  if (!amount) return 0;
+  const rate = CURRENCIES[currencyCode]?.rate || 1;
+  return Math.round(amount / rate);
 }
 
 function getGoogleMapsLink(location, coordinates) {
@@ -138,9 +146,7 @@ export default function TravelPlanner() {
     const t = Math.max(1, Math.floor(Number(travelers) || 1));
     const curr = CURRENCIES[currency];
     const userBudgetInCurrency = Math.max(0, Number(budget) || 0);
-    const userBudgetINR = userBudgetInCurrency > 0
-      ? Math.round((userBudgetInCurrency / curr.rate) * 83)
-      : 0;
+    const userBudgetINR = toINR(userBudgetInCurrency, currency);
     const destData = findDestination(place);
     runGenerate(n, t, userBudgetINR, userBudgetInCurrency, curr, destData, place);
   };
@@ -213,7 +219,6 @@ export default function TravelPlanner() {
 
     dayObjects.sort((a, b) => a.day - b.day);
     const finalTotalINR = dayObjects.reduce((s, d) => s + d.dayCost, 0);
-    const finalTotalDisplay = Math.round((finalTotalINR / 83) * curr.rate);
 
     setItinerary(dayObjects);
     setTotal(finalTotalINR);
@@ -228,7 +233,7 @@ export default function TravelPlanner() {
     } else if (finalTotalINR <= userBudgetINR) {
       setMsg({ text: `✅ Plan fits within your ${formatCurrency(userBudgetInCurrency, currency)} budget!`, type: "success" });
     } else {
-      setMsg({ text: `⚠️ Estimated ${formatCurrency(finalTotalDisplay, currency)} — slightly over budget. Expensive activities marked as self-guided.`, type: "warn" });
+      setMsg({ text: `⚠️ Estimated ${formatCurrency(finalTotalINR, currency)} — slightly over budget. Expensive activities marked as self-guided.`, type: "warn" });
     }
   };
 
@@ -294,16 +299,13 @@ export default function TravelPlanner() {
     const t = Math.max(1, Math.floor(Number(travelers) || 1));
     const curr = CURRENCIES[currency];
     const userBudgetInCurrency = Math.max(0, Number(budget) || 0);
-    const userBudgetINR = userBudgetInCurrency > 0
-      ? Math.round((userBudgetInCurrency / curr.rate) * 83)
-      : 0;
+    const userBudgetINR = toINR(userBudgetInCurrency, currency);
     const destData = findDestination(overridePlace || place);
     runGenerate(n, t, userBudgetINR, userBudgetInCurrency, curr, destData, overridePlace || place);
   };
 
-  const curr = CURRENCIES[currency];
   const userBudgetInCurrency = Number(budget) || 0;
-  const userBudgetINR = userBudgetInCurrency > 0 ? Math.round((userBudgetInCurrency / curr.rate) * 83) : 0;
+  const userBudgetINR = toINR(userBudgetInCurrency, currency);
   const budgetPct = userBudgetINR > 0 ? Math.min(100, (total / userBudgetINR) * 100) : 0;
   const overBudget = userBudgetINR > 0 && total > userBudgetINR;
   const catMeta = CATEGORY_META[category];
@@ -476,7 +478,7 @@ export default function TravelPlanner() {
                 { label: "Duration", value: `${itinerary.length} days`, icon: "🗓️" },
                 { label: "Travelers", value: travelers, icon: "👥" },
                 { label: "Trip Style", value: catMeta.label, icon: catMeta.icon },
-                { label: "Est. Total", value: formatCurrency(Math.round((total / 83) * curr.rate), currency), icon: "💰" },
+                { label: "Est. Total", value: formatCurrency(total, currency), icon: "💰" },
               ].map((s) => (
                 <div className="tp-stat-card" key={s.label}>
                   <div className="tp-stat-icon">{s.icon}</div>
@@ -502,7 +504,7 @@ export default function TravelPlanner() {
                 <div className="tp-budget-bar-header">
                   <span>Budget Usage</span>
                   <span style={{ color: overBudget ? "#ef4444" : "#10b981", fontWeight: 700 }}>
-                    {formatCurrency(Math.round((total / 83) * curr.rate), currency)} / {formatCurrency(userBudgetInCurrency, currency)}
+                    {formatCurrency(total, currency)} / {formatCurrency(userBudgetInCurrency, currency)}
                   </span>
                 </div>
                 <div className="tp-budget-track">
@@ -548,7 +550,7 @@ export default function TravelPlanner() {
                     <div className="tp-day-badge" style={{ background: catMeta.color }}>
                       Day {day.day}
                     </div>
-                    <div className="tp-day-cost">{formatCurrency(Math.round((day.dayCost / 83) * curr.rate), currency)}</div>
+                    <div className="tp-day-cost">{formatCurrency(day.dayCost, currency)}</div>
                     <div className="tp-day-chevron">{activeDay === day.day ? "▲" : "▼"}</div>
                   </div>
 
@@ -588,7 +590,7 @@ export default function TravelPlanner() {
                               <div className="tp-activity-description">{a.description}</div>
                             )}
                             <div className="tp-activity-meta">
-                              <span className="tp-tag tp-tag-cost">{formatCurrency(Math.round((a.cost / 83) * curr.rate), currency)}</span>
+                              <span className="tp-tag tp-tag-cost">{formatCurrency(a.cost, currency)}</span>
                               <span className="tp-tag tp-tag-hours">⏱ {a.hours}h</span>
                               <span
                                 className="tp-tag tp-tag-diff"
@@ -602,7 +604,7 @@ export default function TravelPlanner() {
                       ))}
                       <div className="tp-day-footer">
                         <span>🍽️ Meals + 🚌 Transport included</span>
-                        <span className="tp-day-total">Day Total: {formatCurrency(Math.round((day.dayCost / 83) * curr.rate), currency)}</span>
+                        <span className="tp-day-total">Day Total: {formatCurrency(day.dayCost, currency)}</span>
                       </div>
                     </div>
                   )}
