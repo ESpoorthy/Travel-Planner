@@ -130,34 +130,33 @@ export default function TravelPlanner() {
   const [activeDay, setActiveDay] = useState(null);
   const [copied, setCopied] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [saveToast, setSaveToast] = useState(false);
 
   const generate = (e) => {
     e && e.preventDefault();
     const n = Math.max(1, Math.min(30, Math.floor(Number(days) || 1)));
     const t = Math.max(1, Math.floor(Number(travelers) || 1));
-
-    // Convert user budget to INR (all internal costs are in INR)
     const curr = CURRENCIES[currency];
     const userBudgetInCurrency = Math.max(0, Number(budget) || 0);
-    // budget is entered in selected currency → convert to INR for comparison
     const userBudgetINR = userBudgetInCurrency > 0
-      ? Math.round((userBudgetInCurrency / curr.rate) * 83) // to INR
+      ? Math.round((userBudgetInCurrency / curr.rate) * 83)
       : 0;
-
     const destData = findDestination(place);
+    runGenerate(n, t, userBudgetINR, userBudgetInCurrency, curr, destData, place);
+  };
 
+  const runGenerate = (n, t, userBudgetINR, userBudgetInCurrency, curr, destData, resolvedPlace) => {
     let dayObjects;
 
     if (destData && destData.dayPlans) {
       const baseItinerary = buildItineraryFromDayPlans(destData, n);
 
       if (userBudgetINR > 0) {
-        const budgetPerDay = Math.floor(userBudgetINR / n);          // INR per day
-        const mealsTransport = Math.min(300, Math.floor(budgetPerDay * 0.2)); // 20% for meals+transport, max ₹300
+        const budgetPerDay = Math.floor(userBudgetINR / n);
+        const mealsTransport = Math.min(300, Math.floor(budgetPerDay * 0.2));
 
         dayObjects = baseItinerary.map(day => {
           let activityBudget = budgetPerDay - mealsTransport;
-          // Sort activities cheapest first so we always include something
           const sorted = [...day.activities].sort((a, b) => (a.cost || 0) - (b.cost || 0));
           const picked = [];
           let spent = 0;
@@ -167,7 +166,6 @@ export default function TravelPlanner() {
               picked.push({ ...act, cost: act.cost || 0 });
               spent += actCost;
             } else {
-              // Replace with a free/cheap version of the same slot
               picked.push({
                 ...act,
                 cost: 0,
@@ -180,7 +178,6 @@ export default function TravelPlanner() {
           return { day: day.day, activities: picked, dayCost };
         });
       } else {
-        // No budget — show full curated plan
         dayObjects = baseItinerary.map(day => ({
           ...day,
           activities: day.activities.map(a => ({ ...a })),
@@ -188,22 +185,17 @@ export default function TravelPlanner() {
         }));
       }
     } else {
-      // Generic pool fallback
       const pool = POOLS[category] || POOLS.sightseeing;
 
       if (userBudgetINR > 0) {
         const budgetPerDay = Math.floor(userBudgetINR / n);
         const mealsTransport = Math.min(300, Math.floor(budgetPerDay * 0.2));
         const actBudgetPerDay = budgetPerDay - mealsTransport;
-
-        // Filter pool to only activities that fit per-day activity budget
         const affordable = pool
           .filter(a => (a.cost || 0) * t <= actBudgetPerDay)
-          .sort((a, b) => (b.cost || 0) - (a.cost || 0)); // best value first
-
+          .sort((a, b) => (b.cost || 0) - (a.cost || 0));
         const fallbackPool = affordable.length >= 3 ? affordable : pool.sort((a, b) => a.cost - b.cost);
         const daysSchedule = buildDailySchedule(fallbackPool, n);
-
         dayObjects = daysSchedule.map((acts, idx) => {
           const activities = acts.map(a => ({ ...a }));
           const dayCost = activities.reduce((s, a) => s + (a.cost || 0), 0) * t + mealsTransport * t;
@@ -221,7 +213,6 @@ export default function TravelPlanner() {
 
     dayObjects.sort((a, b) => a.day - b.day);
     const finalTotalINR = dayObjects.reduce((s, d) => s + d.dayCost, 0);
-    // Convert final total back to selected currency for display
     const finalTotalDisplay = Math.round((finalTotalINR / 83) * curr.rate);
 
     setItinerary(dayObjects);
@@ -233,7 +224,7 @@ export default function TravelPlanner() {
 
     const hasRealPlan = !!(destData && destData.dayPlans);
     if (!budget) {
-      setMsg({ text: hasRealPlan ? `Curated ${n}-day plan for ${place} ready!` : "No budget set — showing a suggested plan.", type: "info" });
+      setMsg({ text: hasRealPlan ? `Curated ${n}-day plan for ${resolvedPlace} ready!` : "No budget set — showing a suggested plan.", type: "info" });
     } else if (finalTotalINR <= userBudgetINR) {
       setMsg({ text: `✅ Plan fits within your ${formatCurrency(userBudgetInCurrency, currency)} budget!`, type: "success" });
     } else {
@@ -283,7 +274,31 @@ export default function TravelPlanner() {
     if (user) {
       localStorage.setItem(`trips_${user.id}`, JSON.stringify(saved));
     }
-    alert("Trip saved! View it in Saved Trips from your profile.");
+    setSaveToast(true);
+    setTimeout(() => setSaveToast(false), 3000);
+  };
+
+  // Called from Favourites "Plan ✈️" — sets destination and immediately generates
+  const planFromFavourite = (dest) => {
+    setPlace(dest);
+    setShowSuggestions(false);
+    // Use a tiny timeout so state flushes before generate reads `place`
+    setTimeout(() => {
+      generateForPlace(dest);
+    }, 50);
+  };
+
+  // generate that accepts an explicit place override (for programmatic calls)
+  const generateForPlace = (overridePlace) => {
+    const n = Math.max(1, Math.min(30, Math.floor(Number(days) || 1)));
+    const t = Math.max(1, Math.floor(Number(travelers) || 1));
+    const curr = CURRENCIES[currency];
+    const userBudgetInCurrency = Math.max(0, Number(budget) || 0);
+    const userBudgetINR = userBudgetInCurrency > 0
+      ? Math.round((userBudgetInCurrency / curr.rate) * 83)
+      : 0;
+    const destData = findDestination(overridePlace || place);
+    runGenerate(n, t, userBudgetINR, userBudgetInCurrency, curr, destData, overridePlace || place);
   };
 
   const curr = CURRENCIES[currency];
@@ -304,7 +319,7 @@ export default function TravelPlanner() {
           </div>
           <div className="tp-nav-links">
             <span className="tp-nav-badge">Smart Planner</span>
-            {user && <UserProfile onSelectDestination={(dest) => { setPlace(dest); setShowSuggestions(false); }} />}
+            {user && <UserProfile onSelectDestination={planFromFavourite} />}
           </div>
         </div>
       </nav>
@@ -611,6 +626,13 @@ export default function TravelPlanner() {
           </div>
         </div>
       </footer>
+
+      {/* Save Toast */}
+      {saveToast && (
+        <div className="tp-save-toast">
+          💾 Trip saved! Open your profile → Saved Trips to view it.
+        </div>
+      )}
     </div>
   );
 }
