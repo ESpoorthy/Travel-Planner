@@ -486,6 +486,398 @@ export const DESTINATIONS = {
         }
       }
     }
+  },
+
+  paris: {
+    name: "Paris",
+    country: "France",
+    coordinates: { lat: 48.8566, lng: 2.3522 },
+    dayPlans: {
+      1: {
+        morning: {
+          name: "Eiffel Tower Visit & Champ de Mars",
+          cost: 2800, hours: 3, diff: "Easy", icon: "🗼",
+          location: "Champ de Mars, 5 Av. Anatole France, Paris",
+          coordinates: { lat: 48.8584, lng: 2.2945 },
+          description: "Skip-the-line access to the iconic Eiffel Tower. Climb to the summit for panoramic Paris views. Stroll through Champ de Mars gardens."
+        },
+        afternoon: {
+          name: "Lunch at Café de Flore & Saint-Germain Walk",
+          cost: 1800, hours: 2.5, diff: "Easy", icon: "☕",
+          location: "172 Bd Saint-Germain, Paris",
+          coordinates: { lat: 48.8539, lng: 2.3328 },
+          description: "Iconic Parisian café frequented by Sartre and Picasso. Try croque-monsieur and café au lait. Stroll the literary Saint-Germain-des-Prés quarter."
+        },
+        evening: {
+          name: "Louvre Museum Highlights Tour",
+          cost: 4500, hours: 3, diff: "Easy", icon: "🎨",
+          location: "Rue de Rivoli, 75001 Paris",
+          coordinates: { lat: 48.8606, lng: 2.3376 },
+          description: "See Mona Lisa, Venus de Milo, and Winged Victory. Expert guide reveals hidden stories. World's largest art museum with 35,000 works."
+        },
+        night: {
+          name: "Seine River Dinner Cruise",
+          cost: 7000, hours: 2.5, diff: "Easy", icon: "🛳️",
+          location: "Port de la Bourdonnais, Paris",
+          coordinates: { lat: 48.8606, lng: 2.2945 },
+          description: "Gourmet 3-course dinner while cruising past illuminated Notre-Dame, Eiffel Tower, and Musée d'Orsay. Live accordion music included."
+        }
+      },
+      2: {
+        morning: {
+          name: "Palace of Versailles & Gardens",
+          cost: 5500, hours: 5, diff: "Easy", icon: "🏰",
+          location: "Place d'Armes, 78000 Versailles",
+          coordinates: { lat: 48.8049, lng: 2.1204 },
+          description: "UNESCO World Heritage royal palace. See Hall of Mirrors, King's Grand Apartments, and 800-hectare formal gardens with fountains."
+        },
+        afternoon: {
+          name: "Montmartre & Sacré-Cœur Basilica",
+          cost: 0, hours: 3, diff: "Easy", icon: "⛪",
+          location: "35 Rue du Chevalier de la Barre, Paris",
+          coordinates: { lat: 48.8867, lng: 2.3431 },
+          description: "Climb the bohemian hilltop village. Visit the white-domed Sacré-Cœur. Explore Place du Tertre where artists paint portraits."
+        },
+        evening: {
+          name: "Moulin Rouge Show",
+          cost: 12000, hours: 2.5, diff: "Easy", icon: "🎭",
+          location: "82 Bd de Clichy, 75018 Paris",
+          coordinates: { lat: 48.8841, lng: 2.3322 },
+          description: "World-famous cabaret show since 1889. Spectacular can-can dancers, feathers, and rhinestones. Champagne included. Book weeks in advance."
+        },
+        night: {
+          name: "Late Night Crêpes at Rue de la Huchette",
+          cost: 400, hours: 1, diff: "Easy", icon: "🥞",
+          location: "Rue de la Huchette, Paris",
+          coordinates: { lat: 48.8527, lng: 2.3472 },
+          description: "Paris's most famous street for late-night crêpes. Try Nutella, salted caramel, or ham-cheese crêpes from street vendors."
+        }
+      },
+      3: {
+        morning: {
+          name: "Notre-Dame Cathedral & Île de la Cité",
+          cost: 0, hours: 2, diff: "Easy", icon: "🕍",
+          location: "6 Parvis Notre-Dame, Paris",
+          coordinates: { lat: 48.8530, lng: 2.3499 },
+          description: "Gothic masterpiece under restoration after 2019 fire. Explore the island, Sainte-Chapelle's stunning stained glass, and Conciergerie palace."
+        },
+        afternoon: {
+          name: "Le Marais District & Picasso Museum",
+          cost: 1400, hours: 3, diff: "Easy", icon: "🖼️",
+          location: "5 Rue de Thorigny, 75003 Paris",
+          coordinates: { lat: 48.8596, lng: 2.3622 },
+          description: "Trendy historic district with medieval mansions. Visit Musée Picasso with 5,000 works. Browse boutiques and falafel shops on Rue des Rosiers."
+        },
+        evening: {
+          name: "Arc de Triomphe & Champs-Élysées",
+          cost: 1300, hours: 2, diff: "Easy", icon: "🏛️",
+          location: "Pl. Charles de Gaulle, 75008 Paris",
+          coordinates: { lat: 48.8738, lng: 2.2950 },
+          description: "Climb Napoleon's triumphal arch for sunset views down the Champs-Élysées. Watch the eternal flame at the Tomb of the Unknown Soldier."
+        },
+        night: {
+          name: "Dinner at Le Jules Verne, Eiffel Tower",
+          cost: 15000, hours: 2, diff: "Easy", icon: "🍽️",
+          location: "Eiffel Tower, 2nd Floor, Paris",
+          coordinates: { lat: 48.8584, lng: 2.2945 },
+          description: "Michelin-starred restaurant on the 2nd floor of the Eiffel Tower. Contemporary French cuisine with breathtaking city views. Reserve months ahead."
+        }
+      }
+    }
+  },
+
+  dubai: {
+    name: "Dubai",
+    country: "UAE",
+    coordinates: { lat: 25.2048, lng: 55.2708 },
+    dayPlans: {
+      1: {
+        morning: {
+          name: "Burj Khalifa At The Top & Dubai Fountain",
+          cost: 4500, hours: 3, diff: "Easy", icon: "🏙️",
+          location: "1 Sheikh Mohammed bin Rashid Blvd, Dubai",
+          coordinates: { lat: 25.1972, lng: 55.2744 },
+          description: "World's tallest building at 828m. Observation deck at 555m with desert and Gulf views. Watch the Dubai Fountain show at the base."
+        },
+        afternoon: {
+          name: "Dubai Mall & Aquarium",
+          cost: 1500, hours: 3, diff: "Easy", icon: "🐠",
+          location: "Financial Centre Rd, Downtown Dubai",
+          coordinates: { lat: 25.1972, lng: 55.2796 },
+          description: "World's largest mall. Walk through the 10-million-litre aquarium tunnel with sharks and rays. Ice rink, VR park, and 1,200+ stores."
+        },
+        evening: {
+          name: "Gold Souk & Spice Souk, Deira",
+          cost: 500, hours: 2, diff: "Easy", icon: "💍",
+          location: "Gold Souk, Deira, Dubai",
+          coordinates: { lat: 25.2697, lng: 55.3094 },
+          description: "Traditional Arabian market with 300+ gold shops. Cross the Dubai Creek by abra (water taxi). Explore aromatic spice souk with saffron and frankincense."
+        },
+        night: {
+          name: "Dinner at Pierchic, Madinat Jumeirah",
+          cost: 8000, hours: 2, diff: "Easy", icon: "🦞",
+          location: "Al Qasr Hotel, Madinat Jumeirah, Dubai",
+          coordinates: { lat: 25.1324, lng: 55.1856 },
+          description: "Overwater restaurant on a private pier with Burj Al Arab views. Fresh seafood and Mediterranean cuisine. Most romantic restaurant in Dubai."
+        }
+      },
+      2: {
+        morning: {
+          name: "Desert Safari with Dune Bashing",
+          cost: 3500, hours: 6, diff: "Medium", icon: "🏜️",
+          location: "Dubai Desert Conservation Reserve",
+          coordinates: { lat: 24.8607, lng: 55.7281 },
+          description: "Thrilling 4x4 dune bashing at sunset. Camel ride, sandboarding, henna painting. BBQ dinner under stars with belly dance and tanoura show."
+        },
+        afternoon: {
+          name: "Jumeirah Mosque & Al Fahidi District",
+          cost: 300, hours: 2.5, diff: "Easy", icon: "🕌",
+          location: "Jumeirah Beach Rd, Dubai",
+          coordinates: { lat: 25.2285, lng: 55.2614 },
+          description: "Dubai's most photographed mosque open to non-Muslims. Walk through Al Fahidi Historical Neighbourhood with wind-tower architecture and art galleries."
+        },
+        evening: {
+          name: "Palm Jumeirah & Atlantis View",
+          cost: 0, hours: 2, diff: "Easy", icon: "🌴",
+          location: "Palm Jumeirah, Dubai",
+          coordinates: { lat: 25.1124, lng: 55.1390 },
+          description: "Walk or monorail across the world's largest artificial island. View the iconic Atlantis hotel. Visit The Pointe for waterfront dining and fountain views."
+        },
+        night: {
+          name: "Dubai Frame & Night City Views",
+          cost: 1200, hours: 2, diff: "Easy", icon: "🖼️",
+          location: "Zabeel Park, Dubai",
+          coordinates: { lat: 25.2350, lng: 55.3000 },
+          description: "World's largest picture frame at 150m. Glass-floored sky bridge between old and new Dubai. Stunning panoramic night views of the entire city."
+        }
+      },
+      3: {
+        morning: {
+          name: "Dubai Museum & Old Dubai Creek",
+          cost: 400, hours: 2.5, diff: "Easy", icon: "🏺",
+          location: "Al Fahidi Fort, Bur Dubai",
+          coordinates: { lat: 25.2631, lng: 55.2972 },
+          description: "Oldest building in Dubai (1787). Exhibits on Bedouin life, pearl diving, and city's transformation. Take an abra across the historic Dubai Creek."
+        },
+        afternoon: {
+          name: "Lunch at Arabian Tea House & Bastakiya",
+          cost: 1200, hours: 2, diff: "Easy", icon: "🍲",
+          location: "Al Fahidi St, Bur Dubai",
+          coordinates: { lat: 25.2631, lng: 55.2972 },
+          description: "Authentic Emirati cuisine in a 100-year-old courtyard. Try machboos, luqaimat, and karak chai. Explore the restored Bastakiya quarter."
+        },
+        evening: {
+          name: "Kite Beach & Sunset Walk",
+          cost: 0, hours: 2, diff: "Easy", icon: "🏖️",
+          location: "Kite Beach, Jumeirah, Dubai",
+          coordinates: { lat: 25.1924, lng: 55.2406 },
+          description: "Public beach with Burj Al Arab backdrop. Watch kite surfers, beach volleyball. Food trucks, outdoor gym, and stunning sunset over the Arabian Gulf."
+        },
+        night: {
+          name: "La Mer & Bluewaters Island",
+          cost: 2000, hours: 3, diff: "Easy", icon: "🎡",
+          location: "Bluewaters Island, Dubai",
+          coordinates: { lat: 25.0800, lng: 55.1200 },
+          description: "Trendy beachfront district with street art and restaurants. Visit Ain Dubai — world's largest observation wheel at 250m. Vibrant nightlife and dining."
+        }
+      }
+    }
+  },
+
+  tokyo: {
+    name: "Tokyo",
+    country: "Japan",
+    coordinates: { lat: 35.6762, lng: 139.6503 },
+    dayPlans: {
+      1: {
+        morning: {
+          name: "Senso-ji Temple & Nakamise Shopping Street",
+          cost: 0, hours: 2.5, diff: "Easy", icon: "⛩️",
+          location: "2 Chome-3-1 Asakusa, Taito City, Tokyo",
+          coordinates: { lat: 35.7148, lng: 139.7967 },
+          description: "Tokyo's oldest temple founded in 628 AD. Walk through the iconic Thunder Gate (Kaminarimon). Shop for traditional souvenirs on Nakamise-dori street."
+        },
+        afternoon: {
+          name: "Tsukiji Outer Market & Sushi Lunch",
+          cost: 2500, hours: 2.5, diff: "Easy", icon: "🍣",
+          location: "4 Chome-16-2 Tsukiji, Chuo City, Tokyo",
+          coordinates: { lat: 35.6654, lng: 139.7707 },
+          description: "World-famous fish market outer section. Sample fresh sushi, tamagoyaki, and seafood skewers. Watch skilled chefs at work in tiny stalls."
+        },
+        evening: {
+          name: "Shibuya Crossing & Scramble Square",
+          cost: 2000, hours: 2, diff: "Easy", icon: "🚦",
+          location: "2 Chome-24-12 Shibuya, Tokyo",
+          coordinates: { lat: 35.6595, lng: 139.7004 },
+          description: "World's busiest pedestrian crossing with 3,000 people per light cycle. Climb Shibuya Sky observation deck for 360° views. Explore Shibuya 109 fashion."
+        },
+        night: {
+          name: "Omoide Yokocho (Memory Lane) Dinner",
+          cost: 2000, hours: 2, diff: "Easy", icon: "🍢",
+          location: "1 Chome-2 Nishishinjuku, Shinjuku, Tokyo",
+          coordinates: { lat: 35.6938, lng: 139.7006 },
+          description: "Narrow alley of tiny yakitori bars dating from 1940s. Sit elbow-to-elbow with locals. Try grilled chicken skewers, sake, and smoky atmosphere."
+        }
+      },
+      2: {
+        morning: {
+          name: "TeamLab Borderless Digital Art Museum",
+          cost: 3200, hours: 3, diff: "Easy", icon: "🎨",
+          location: "Azabudai Hills, Minato City, Tokyo",
+          coordinates: { lat: 35.6595, lng: 139.7432 },
+          description: "Immersive digital art museum with no maps or boundaries. Walk through infinite crystal universes, flower forests, and interactive light installations."
+        },
+        afternoon: {
+          name: "Meiji Shrine & Harajuku Takeshita Street",
+          cost: 0, hours: 3, diff: "Easy", icon: "🌿",
+          location: "1-1 Yoyogikamizonocho, Shibuya, Tokyo",
+          coordinates: { lat: 35.6763, lng: 139.6993 },
+          description: "Serene Shinto shrine in forested park. Walk the 700m gravel path through towering torii gates. Then explore Harajuku's wild Takeshita Street fashion."
+        },
+        evening: {
+          name: "Akihabara Electric Town",
+          cost: 1500, hours: 2.5, diff: "Easy", icon: "🎮",
+          location: "Akihabara, Chiyoda City, Tokyo",
+          coordinates: { lat: 35.7022, lng: 139.7741 },
+          description: "Tokyo's electronics and anime mecca. Multi-floor arcades, manga shops, maid cafes, and retro game stores. Neon-lit streets buzzing with otaku culture."
+        },
+        night: {
+          name: "Tokyo Skytree Night View",
+          cost: 3000, hours: 2, diff: "Easy", icon: "🌃",
+          location: "1 Chome-1-2 Oshiage, Sumida City, Tokyo",
+          coordinates: { lat: 35.7101, lng: 139.8107 },
+          description: "World's second tallest structure at 634m. Two observation decks with glass floors. Stunning night panorama of Tokyo's 37-million-person metropolis."
+        }
+      },
+      3: {
+        morning: {
+          name: "Shinjuku Gyoen National Garden",
+          cost: 500, hours: 2, diff: "Easy", icon: "🌸",
+          location: "11 Naitomachi, Shinjuku City, Tokyo",
+          coordinates: { lat: 35.6852, lng: 139.7100 },
+          description: "Beautiful 58-hectare garden blending French, English, and Japanese styles. 1,500 cherry trees (best in spring). Greenhouse with tropical plants."
+        },
+        afternoon: {
+          name: "Ramen Museum & Lunch in Shinjuku",
+          cost: 1500, hours: 2, diff: "Easy", icon: "🍜",
+          location: "Shinjuku, Tokyo",
+          coordinates: { lat: 35.6938, lng: 139.7034 },
+          description: "Try authentic regional ramen styles — tonkotsu, shoyu, miso. Visit Ichiran for solo ramen booths. Explore Shinjuku's underground food halls."
+        },
+        evening: {
+          name: "Odaiba Island & teamLab Planets",
+          cost: 3200, hours: 3, diff: "Easy", icon: "🏝️",
+          location: "6 Chome-1-16 Toyosu, Koto City, Tokyo",
+          coordinates: { lat: 35.6226, lng: 139.7853 },
+          description: "Futuristic artificial island with Rainbow Bridge views. Walk through water and flower immersive art at teamLab Planets. Gundam statue and Odaiba beach."
+        },
+        night: {
+          name: "Kabukicho & Golden Gai Bar Hopping",
+          cost: 2500, hours: 3, diff: "Easy", icon: "🍺",
+          location: "Kabukicho, Shinjuku, Tokyo",
+          coordinates: { lat: 35.6938, lng: 139.7034 },
+          description: "Tokyo's entertainment district. Explore Golden Gai's 200 tiny bars each seating 5-8 people. Unique themed bars, jazz clubs, and izakayas."
+        }
+      }
+    }
+  },
+
+  mumbai: {
+    name: "Mumbai",
+    country: "India",
+    coordinates: { lat: 19.0760, lng: 72.8777 },
+    dayPlans: {
+      1: {
+        morning: {
+          name: "Gateway of India & Harbour View",
+          cost: 0, hours: 2, diff: "Easy", icon: "🏛️",
+          location: "Apollo Bandar, Colaba, Mumbai",
+          coordinates: { lat: 18.9220, lng: 72.8347 },
+          description: "Iconic 26m basalt arch built in 1924. Watch fishing boats and ferries on Mumbai Harbour. The last British troops left India through this gate in 1948."
+        },
+        afternoon: {
+          name: "Lunch at Leopold Cafe & Colaba Causeway",
+          cost: 800, hours: 2.5, diff: "Easy", icon: "🍛",
+          location: "Colaba Causeway, Mumbai",
+          coordinates: { lat: 18.9220, lng: 72.8317 },
+          description: "Historic café since 1871, featured in Shantaram. Try butter chicken and cold coffee. Shop for antiques, clothes, and handicrafts on Colaba Causeway."
+        },
+        evening: {
+          name: "Elephanta Caves (UNESCO Heritage)",
+          cost: 600, hours: 3, diff: "Medium", icon: "🗿",
+          location: "Elephanta Island, Mumbai Harbour",
+          coordinates: { lat: 18.9633, lng: 72.9315 },
+          description: "5th-century rock-cut cave temples dedicated to Shiva. 1-hour ferry from Gateway of India. See the magnificent 6m Trimurti sculpture."
+        },
+        night: {
+          name: "Marine Drive & Chowpatty Beach",
+          cost: 200, hours: 2, diff: "Easy", icon: "🌊",
+          location: "Marine Drive, Mumbai",
+          coordinates: { lat: 18.9438, lng: 72.8231 },
+          description: "Mumbai's 'Queen's Necklace' — 3.6km seafront promenade. Watch the sunset over the Arabian Sea. Try bhel puri and pav bhaji at Chowpatty Beach."
+        }
+      },
+      2: {
+        morning: {
+          name: "Dharavi Slum Tour & Craft Workshops",
+          cost: 1500, hours: 3, diff: "Easy", icon: "🏭",
+          location: "Dharavi, Mumbai",
+          coordinates: { lat: 19.0422, lng: 72.8530 },
+          description: "Asia's largest slum is also a thriving industrial hub. See leather, pottery, and recycling industries. Respectful guided tour showing resilience and enterprise."
+        },
+        afternoon: {
+          name: "Dabbawala System Tour & Lunch",
+          cost: 1000, hours: 2.5, diff: "Easy", icon: "🍱",
+          location: "Churchgate Station, Mumbai",
+          coordinates: { lat: 18.9356, lng: 72.8258 },
+          description: "Meet Mumbai's legendary tiffin delivery network with 99.99% accuracy. Watch 5,000 dabbawalas sort 200,000 lunch boxes. Lunch at a local Maharashtrian thali."
+        },
+        evening: {
+          name: "Bandra-Worli Sea Link & Bandra",
+          cost: 100, hours: 2, diff: "Easy", icon: "🌉",
+          location: "Bandra-Worli Sea Link, Mumbai",
+          coordinates: { lat: 19.0330, lng: 72.8185 },
+          description: "8-lane cable-stayed bridge spanning 5.6km. Drive across for stunning sunset views. Explore Bandra's hip cafes, street art, and Bandstand promenade."
+        },
+        night: {
+          name: "Dinner at Trishna (Seafood)",
+          cost: 2000, hours: 2, diff: "Easy", icon: "🦀",
+          location: "7 Sai Baba Marg, Kala Ghoda, Mumbai",
+          coordinates: { lat: 18.9281, lng: 72.8319 },
+          description: "Mumbai's most celebrated seafood restaurant since 1981. Try butter-garlic crab, Bombay duck fry, and koliwada prawns. Book in advance."
+        }
+      },
+      3: {
+        morning: {
+          name: "Chhatrapati Shivaji Terminus (UNESCO)",
+          cost: 0, hours: 1.5, diff: "Easy", icon: "🚂",
+          location: "Chhatrapati Shivaji Maharaj Terminus, Mumbai",
+          coordinates: { lat: 18.9400, lng: 72.8353 },
+          description: "Victorian Gothic railway station built in 1887. UNESCO World Heritage Site. Blend of Indian and Victorian architecture with gargoyles and peacocks."
+        },
+        afternoon: {
+          name: "Kala Ghoda Art District & Lunch",
+          cost: 700, hours: 3, diff: "Easy", icon: "🎨",
+          location: "Kala Ghoda, Fort, Mumbai",
+          coordinates: { lat: 18.9281, lng: 72.8319 },
+          description: "Mumbai's cultural hub with galleries, cafes, and street art. Visit Jehangir Art Gallery. Try Irani café food at Britannia & Co. Explore heritage buildings."
+        },
+        evening: {
+          name: "Juhu Beach & Street Food",
+          cost: 300, hours: 2, diff: "Easy", icon: "🏖️",
+          location: "Juhu Beach, Mumbai",
+          coordinates: { lat: 19.0883, lng: 72.8264 },
+          description: "Mumbai's most popular beach. Try pav bhaji, vada pav, and pani puri from street vendors. Watch the sunset and spot Bollywood stars' bungalows nearby."
+        },
+        night: {
+          name: "Bollywood Night Tour & Dinner",
+          cost: 2500, hours: 3, diff: "Easy", icon: "🎬",
+          location: "Film City, Goregaon, Mumbai",
+          coordinates: { lat: 19.1530, lng: 72.8479 },
+          description: "Evening tour of Film City studios. See live sets and shooting locations. Dinner at a Bollywood-themed restaurant with live music and dance performances."
+        }
+      }
+    }
   }
 };
 
